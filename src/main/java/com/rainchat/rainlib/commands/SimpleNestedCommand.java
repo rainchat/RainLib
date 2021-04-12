@@ -1,4 +1,4 @@
-package com.rainchat.parkoursprinter.utils.commands;
+package com.rainchat.rainlib.commands;
 
 import java.util.LinkedHashMap;
 import java.util.stream.Stream;
@@ -13,7 +13,7 @@ public class SimpleNestedCommand {
 
     public SimpleNestedCommand addSubCommand(AbstractCommand command) {
         command.getCommands().forEach((cmd) -> {
-            AbstractCommand var10000 = (AbstractCommand) this.children.put(cmd.toLowerCase(), command);
+            AbstractCommand var10000 = this.children.put(cmd.toLowerCase(), command);
         });
         return this;
     }
@@ -21,7 +21,7 @@ public class SimpleNestedCommand {
     public SimpleNestedCommand addSubCommands(AbstractCommand... commands) {
         Stream.of(commands).forEach((command) -> {
             command.getCommands().forEach((cmd) -> {
-                AbstractCommand var10000 = (AbstractCommand) this.children.put(cmd.toLowerCase(), command);
+                AbstractCommand var10000 = this.children.put(cmd.toLowerCase(), command);
             });
         });
         return this;

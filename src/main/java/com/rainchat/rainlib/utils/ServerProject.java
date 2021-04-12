@@ -1,4 +1,4 @@
-package com.rainchat.parkoursprinter.utils;
+package com.rainchat.rainlib.utils;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Bukkit;
@@ -13,7 +13,7 @@ public enum ServerProject {
 
     private static final ServerProject serverProject = checkProject();
 
-    private ServerProject() {
+    ServerProject() {
     }
 
     private static ServerProject checkProject() {

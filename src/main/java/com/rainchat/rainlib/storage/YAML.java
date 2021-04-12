@@ -1,4 +1,4 @@
-package com.rainchat.parkoursprinter.utils.storage;
+package com.rainchat.rainlib.storage;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -11,8 +11,8 @@ import java.io.InputStreamReader;
 
 public class YAML {
 
-    private JavaPlugin javaPlugin;
-    private String name;
+    private final JavaPlugin javaPlugin;
+    private final String name;
 
     private FileConfiguration fileConfiguration;
     private File file;
@@ -23,11 +23,11 @@ public class YAML {
     }
 
     public void setup() {
-        if(file == null) {
+        if (file == null) {
             file = new File(javaPlugin.getDataFolder(), name + ".yml");
         }
 
-        if(!file.exists()) {
+        if (!file.exists()) {
             file.getParentFile().mkdirs();
             javaPlugin.saveResource(name + ".yml", false);
         }
@@ -37,10 +37,11 @@ public class YAML {
         save();
     }
 
-    private void reload(){
+    private void reload() {
         fileConfiguration = YamlConfiguration.loadConfiguration(file);
         InputStream inputStream = javaPlugin.getResource(name + ".yml");
-        if(inputStream != null) fileConfiguration.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(inputStream)));
+        if (inputStream != null)
+            fileConfiguration.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(inputStream)));
         fileConfiguration = YamlConfiguration.loadConfiguration(file);
     }
 

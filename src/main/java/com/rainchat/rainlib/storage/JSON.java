@@ -1,4 +1,4 @@
-package com.rainchat.parkoursprinter.utils.storage;
+package com.rainchat.rainlib.storage;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -22,7 +22,7 @@ public class JSON<T> {
     public JSON(String file, Plugin plugin) {
         this.plugin = plugin;
         this.gson = new GsonBuilder().setPrettyPrinting().create();
-        this.file =  new File(plugin.getDataFolder().getPath() + File.separator + file + ".json");
+        this.file = new File(plugin.getDataFolder().getPath() + File.separator + file + ".json");
     }
 
     public void write(Set<T> ts) {

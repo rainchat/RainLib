@@ -1,4 +1,4 @@
-package com.rainchat.parkoursprinter.utils;
+package com.rainchat.rainlib.utils;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Bukkit;
@@ -25,7 +25,7 @@ public enum ServerVersion {
     private static final String serverReleaseVersion = serverPackageVersion.indexOf(82) != -1 ? serverPackageVersion.substring(serverPackageVersion.indexOf(82) + 1) : "";
     private static final ServerVersion serverVersion = getVersion();
 
-    private ServerVersion() {
+    ServerVersion() {
     }
 
     private static ServerVersion getVersion() {
@@ -40,22 +40,6 @@ public enum ServerVersion {
         }
 
         return UNKNOWN;
-    }
-
-    public boolean isLessThan(ServerVersion other) {
-        return this.ordinal() < other.ordinal();
-    }
-
-    public boolean isAtOrBelow(ServerVersion other) {
-        return this.ordinal() <= other.ordinal();
-    }
-
-    public boolean isGreaterThan(ServerVersion other) {
-        return this.ordinal() > other.ordinal();
-    }
-
-    public boolean isAtLeast(ServerVersion other) {
-        return this.ordinal() >= other.ordinal();
     }
 
     public static String getServerVersionString() {
@@ -92,5 +76,21 @@ public enum ServerVersion {
 
     public static boolean isServerVersionBelow(ServerVersion version) {
         return serverVersion.ordinal() < version.ordinal();
+    }
+
+    public boolean isLessThan(ServerVersion other) {
+        return this.ordinal() < other.ordinal();
+    }
+
+    public boolean isAtOrBelow(ServerVersion other) {
+        return this.ordinal() <= other.ordinal();
+    }
+
+    public boolean isGreaterThan(ServerVersion other) {
+        return this.ordinal() > other.ordinal();
+    }
+
+    public boolean isAtLeast(ServerVersion other) {
+        return this.ordinal() >= other.ordinal();
     }
 }

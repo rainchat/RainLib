@@ -1,9 +1,5 @@
 name: ParkourSprinter
 version: ${project.version}
-main: com.rainchat.parkoursprinter.ParkourSprinter
+main: com.rainchat.rainlib.RainCore
 api-version: 1.16
 authors: [ rain_chat ]
-
-commands:
-  spigui:
-    aliases: gui

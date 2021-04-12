@@ -1,8 +1,8 @@
-package com.rainchat.parkoursprinter.utils.commands;
+package com.rainchat.rainlib.commands;
 
-import com.rainchat.parkoursprinter.utils.ServerProject;
-import com.rainchat.parkoursprinter.utils.ServerVersion;
-import com.rainchat.parkoursprinter.utils.commands.AbstractCommand.ReturnType;
+import com.rainchat.rainlib.commands.AbstractCommand.ReturnType;
+import com.rainchat.rainlib.utils.ServerProject;
+import com.rainchat.rainlib.utils.ServerVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.*;
@@ -35,6 +35,34 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         this.plugin = plugin;
     }
 
+    public static void registerCommandDynamically(Plugin plugin, String command, CommandExecutor executor, TabCompleter tabManager) {
+        try {
+            Class<?> classCraftServer = Bukkit.getServer().getClass();
+            Field fieldCommandMap = classCraftServer.getDeclaredField("commandMap");
+            fieldCommandMap.setAccessible(true);
+            SimpleCommandMap commandMap = (SimpleCommandMap) fieldCommandMap.get(Bukkit.getServer());
+            Constructor<PluginCommand> constructorPluginCommand = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
+            constructorPluginCommand.setAccessible(true);
+            PluginCommand commandObject = constructorPluginCommand.newInstance(command, plugin);
+            if (ServerProject.isServer(ServerProject.PAPER, ServerProject.TACO) && ServerVersion.isServerVersionBelow(ServerVersion.V1_9)) {
+                Class<?> clazz = Class.forName("co.aikar.timings.TimingsManager");
+                Method method = clazz.getMethod("getCommandTiming", String.class, Command.class);
+                Field field = PluginCommand.class.getField("timings");
+                field.set(commandObject, method.invoke(null, plugin.getName().toLowerCase(), commandObject));
+            }
+
+            commandObject.setExecutor(executor);
+            commandObject.setTabCompleter(tabManager);
+            Field fieldKnownCommands = SimpleCommandMap.class.getDeclaredField("knownCommands");
+            fieldKnownCommands.setAccessible(true);
+            Map<String, Command> knownCommands = (Map<String, Command>) fieldKnownCommands.get(commandMap);
+            knownCommands.put(command, commandObject);
+        } catch (ReflectiveOperationException var12) {
+            var12.printStackTrace();
+        }
+
+    }
+
     public void setNoConsoleMessage(String msg_noConsole) {
         this.msg_noConsole = msg_noConsole;
     }
@@ -56,7 +84,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
     }
 
     public List<String> getSubCommands(String command) {
-        SimpleNestedCommand nested = command == null ? null : (SimpleNestedCommand) this.commands.get(command.toLowerCase());
+        SimpleNestedCommand nested = command == null ? null : this.commands.get(command.toLowerCase());
         return nested == null ? Collections.emptyList() : new ArrayList<>(nested.children.keySet());
     }
 
@@ -111,7 +139,6 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         return nested;
     }
 
-
     public CommandManager addCommands(AbstractCommand... abstractCommands) {
         AbstractCommand[] var2 = abstractCommands;
         int var3 = abstractCommands.length;
@@ -141,12 +168,12 @@ public class CommandManager implements CommandExecutor, TabCompleter {
     }
 
     public boolean onCommand(@NotNull CommandSender commandSender, Command command, @NotNull String label, String[] args) {
-        SimpleNestedCommand nested = (SimpleNestedCommand) this.commands.get(command.getName().toLowerCase());
+        SimpleNestedCommand nested = this.commands.get(command.getName().toLowerCase());
         if (nested != null) {
             if (args.length != 0 && !nested.children.isEmpty()) {
                 String subCmd = this.getSubCommand(nested, args);
                 if (subCmd != null) {
-                    AbstractCommand sub = (AbstractCommand) nested.children.get(subCmd);
+                    AbstractCommand sub = nested.children.get(subCmd);
                     int i = subCmd.indexOf(32) == -1 ? 1 : 2;
                     String[] newArgs = new String[args.length - i];
                     System.arraycopy(args, i, newArgs, 0, newArgs.length);
@@ -176,7 +203,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                 return k.indexOf(32) != -1;
             })) {
                 for (count = args.length; count > 1; --count) {
-                    String cmd2 = String.join(" ", (CharSequence[]) Arrays.copyOf(args, count)).toLowerCase();
+                    String cmd2 = String.join(" ", Arrays.copyOf(args, count)).toLowerCase();
                     if (nested.children.containsKey(cmd2)) {
                         return cmd2;
                     }
@@ -233,11 +260,11 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                 if (args.length == 1) {
                     subCmd = args[0].toLowerCase();
                     return nested.children.entrySet().stream().filter((e) -> {
-                        return !console || !( e.getValue()).isNoConsole();
+                        return !console || !(e.getValue()).isNoConsole();
                     }).filter((e) -> {
                         return (e.getKey()).startsWith(subCmd);
                     }).filter((e) -> {
-                        return op || ( e.getValue()).getPermissionNode() == null || sender.hasPermission(( e.getValue()).getPermissionNode());
+                        return op || (e.getValue()).getPermissionNode() == null || sender.hasPermission((e.getValue()).getPermissionNode());
                     }).map(Map.Entry::getKey).collect(Collectors.toList());
                 } else {
                     subCmd = this.getSubCommand(nested, args);
@@ -274,33 +301,5 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         }
 
         return list;
-    }
-
-    public static void registerCommandDynamically(Plugin plugin, String command, CommandExecutor executor, TabCompleter tabManager) {
-        try {
-            Class<?> classCraftServer = Bukkit.getServer().getClass();
-            Field fieldCommandMap = classCraftServer.getDeclaredField("commandMap");
-            fieldCommandMap.setAccessible(true);
-            SimpleCommandMap commandMap = (SimpleCommandMap) fieldCommandMap.get(Bukkit.getServer());
-            Constructor<PluginCommand> constructorPluginCommand = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
-            constructorPluginCommand.setAccessible(true);
-            PluginCommand commandObject = constructorPluginCommand.newInstance(command, plugin);
-            if (ServerProject.isServer(ServerProject.PAPER, ServerProject.TACO) && ServerVersion.isServerVersionBelow(ServerVersion.V1_9)) {
-                Class<?> clazz = Class.forName("co.aikar.timings.TimingsManager");
-                Method method = clazz.getMethod("getCommandTiming", String.class, Command.class);
-                Field field = PluginCommand.class.getField("timings");
-                field.set(commandObject, method.invoke(null, plugin.getName().toLowerCase(), commandObject));
-            }
-
-            commandObject.setExecutor(executor);
-            commandObject.setTabCompleter(tabManager);
-            Field fieldKnownCommands = SimpleCommandMap.class.getDeclaredField("knownCommands");
-            fieldKnownCommands.setAccessible(true);
-            Map<String, Command> knownCommands = (Map<String, Command>) fieldKnownCommands.get(commandMap);
-            knownCommands.put(command, commandObject);
-        } catch (ReflectiveOperationException var12) {
-            var12.printStackTrace();
-        }
-
     }
 }

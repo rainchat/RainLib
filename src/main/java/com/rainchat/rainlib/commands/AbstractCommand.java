@@ -1,4 +1,4 @@
-package com.rainchat.parkoursprinter.utils.commands;
+package com.rainchat.rainlib.commands;
 
 import org.bukkit.command.CommandSender;
 
