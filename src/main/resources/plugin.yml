@@ -1,0 +1,9 @@
+name: ParkourSprinter
+version: ${project.version}
+main: com.rainchat.parkoursprinter.ParkourSprinter
+api-version: 1.16
+authors: [ rain_chat ]
+
+commands:
+  spigui:
+    aliases: gui
