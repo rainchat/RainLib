@@ -2,6 +2,7 @@
 
 
 Maven:
+
 	<repositories>
 		<repository>
 		    <id>jitpack.io</id>
