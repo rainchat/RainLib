@@ -1,4 +1,6 @@
 package com.rainchat.rainlib;
 
 
-public final class RainCore {}
+public final class RainCore {
+
+}
